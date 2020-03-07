@@ -1,8 +1,15 @@
 cmake_minimum_required(VERSION 3.16)
 project(cmakub)
 
-file(GLOB_RECURSE SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "src/*")
-add_executable(cmakub ${SOURCES})
+file(GLOB_RECURSE SOURCES_COMMON RELATIVE ${CMAKE_SOURCE_DIR} "src/common/*")
+
+if(SERVER)
+	file(GLOB_RECURSE SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "src/server/*")
+  else()
+	file(GLOB_RECURSE SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "src/client/*")
+endif()
+
+add_executable(cmakub ${SOURCES} ${SOURCES_COMMON})
 
 find_package(glfw3 3.3 REQUIRED)
 find_package(OpenGL REQUIRED)
