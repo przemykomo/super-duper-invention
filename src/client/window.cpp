@@ -7,22 +7,22 @@ namespace cmakub::window {
 	inline void setupWindow() {
 		if(!glfwInit()) {
 				log << "Can't initialize GLFW!\n";
-			}
+		}
 
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-			// Don't change window title while in alpha version
-			window = glfwCreateWindow(640, 480, "cmakub", NULL, NULL);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+		// Don't change window title while in alpha version
+		window = glfwCreateWindow(640, 480, "cmakub", NULL, NULL);
 
-			if(!window) {
-				log << "Window or OpenGL context creation has falied!\n";
-			}
+		if(!window) {
+			log << "Window or OpenGL context creation has falied!\n";
+		}
 
-			glfwMakeContextCurrent(window);
+		glfwMakeContextCurrent(window);
 
-			glfwSwapInterval(1);
-			glfwSetFramebufferSizeCallback(window, onWindowSizeChanged);
-			glfwSetWindowCloseCallback(window, onWindowClose);
+		glfwSwapInterval(1);
+		glfwSetFramebufferSizeCallback(window, onWindowSizeChanged);
+		glfwSetWindowCloseCallback(window, onWindowClose);
 	}
 
 	inline void setupOpenGL() {
