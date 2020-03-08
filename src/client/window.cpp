@@ -4,29 +4,28 @@
 namespace cmakub::window {
 	GLFWwindow* window{};
 
-	void init() {
-		{
-			int major, minor, revision;
-			glfwGetVersion(&major, &minor, &revision);
-			log << "Window init.\nGLFW version: "
-				<< major << "." << minor << "." << revision << "\n";
-		}
-
+	inline void setupWindow() {
 		if(!glfwInit()) {
-			log << "Can't initialize GLFW!\n";
-		}
+				log << "Can't initialize GLFW!\n";
+			}
 
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-		// Don't change window title while in alpha version
-		window = glfwCreateWindow(640, 480, "cmakub", NULL, NULL);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+			// Don't change window title while in alpha version
+			window = glfwCreateWindow(640, 480, "cmakub", NULL, NULL);
 
-		if(!window) {
-			log << "Window or OpenGL context creation has falied!\n";
-		}
+			if(!window) {
+				log << "Window or OpenGL context creation has falied!\n";
+			}
 
-		glfwMakeContextCurrent(window);
+			glfwMakeContextCurrent(window);
 
+			glfwSwapInterval(1);
+			glfwSetFramebufferSizeCallback(window, onWindowSizeChanged);
+			glfwSetWindowCloseCallback(window, onWindowClose);
+	}
+
+	inline void setupOpenGL() {
 		if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 			log << "Can't load OpenGL functions!\n";
 		}
@@ -37,11 +36,19 @@ namespace cmakub::window {
 			glViewport(0, 0, width, height);
 		}
 
-		glfwSwapInterval(1);
-		glfwSetFramebufferSizeCallback(window, onWindowSizeChanged);
-		glfwSetWindowCloseCallback(window, onWindowClose);
-
 		glClearColor(0.00f, 0.20f, 0.25f, 1.0f);
+	}
+
+	void init() {
+		{
+			int major, minor, revision;
+			glfwGetVersion(&major, &minor, &revision);
+			log << "Window init.\nGLFW version: "
+				<< major << "." << minor << "." << revision << "\n";
+		}
+
+		setupWindow();
+		setupOpenGL();
 	}
 
 	void loop() {
