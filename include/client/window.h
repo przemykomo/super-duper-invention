@@ -1,17 +1,30 @@
-#ifndef SRC_WINDOWEVENTS_H_
-#define SRC_WINDOWEVENTS_H_
+#ifndef WINDOW_H_
+#define WINDOW_H_
 
-#include "client/opengl.h"
+#include "client/gl/opengl.h"
+#include "client/gl/ShaderProgram.h"
 
-namespace cmakub::window {
-	void init();
-	void loop();
-	void setWindowShouldClose();
-	void terminate();
+namespace cmakub {
+	class Window {
+	private:
+		int m_width;
+		int m_height;
 
-	// Events, don't call them directly:
-	void onWindowSizeChanged(GLFWwindow *window, int width, int height);
-	void onWindowClose(GLFWwindow *window);
+		GLFWwindow* m_window;
+
+		gl::ShaderProgram shaderProgram;
+
+		inline void setupWindow();
+		inline void setupGL();
+
+		static void onWindowSizeChanged(GLFWwindow *window, int width, int height);
+		static void onWindowClose(GLFWwindow *window);
+	public:
+		Window(int width, int height);
+		void loop();
+		void setWindowShouldClose();
+		~Window();
+	};
 }
 
-#endif /* SRC_WINDOWEVENTS_H_ */
+#endif /* WINDOW_H_ */

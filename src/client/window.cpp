@@ -1,10 +1,22 @@
 #include "client/window.h"
 #include "common/log.h"
 
-namespace cmakub::window {
-	GLFWwindow* window{};
+namespace cmakub {
+	Window::Window(int width, int height) :
+	m_width{width}, m_height{height}, m_window{} {
+#ifndef NDEBUG
+		{
+			int major, minor, revision;
+			glfwGetVersion(&major, &minor, &revision);
+			log << "Window init.\nGLFW version: "
+				<< major << "." << minor << "." << revision << "\n";
+		}
+#endif
+		setupWindow();
+		setupGL();
+	}
 
-	inline void setupWindow() {
+	void Window::setupWindow() {
 		if(!glfwInit()) {
 				log << "Can't initialize GLFW!\n";
 		}
@@ -12,70 +24,77 @@ namespace cmakub::window {
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 		// Don't change window title while in alpha version
-		window = glfwCreateWindow(640, 480, "cmakub", NULL, NULL);
+		m_window = glfwCreateWindow(m_width, m_height, "cmakub", NULL, NULL);
 
-		if(!window) {
+		if(!m_window) {
 			log << "Window or OpenGL context creation has falied!\n";
 		}
 
-		glfwMakeContextCurrent(window);
+		glfwMakeContextCurrent(m_window);
 
 		glfwSwapInterval(1);
-		glfwSetFramebufferSizeCallback(window, onWindowSizeChanged);
-		glfwSetWindowCloseCallback(window, onWindowClose);
+		glfwSetFramebufferSizeCallback(m_window, onWindowSizeChanged);
+		glfwSetWindowCloseCallback(m_window, onWindowClose);
 	}
 
-	inline void setupOpenGL() {
+	void Window::setupGL() {
 		if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 			log << "Can't load OpenGL functions!\n";
 		}
 
-		{
-			int width, height;
-			glfwGetFramebufferSize(window, &width, &height);
-			glViewport(0, 0, width, height);
-		}
+		glViewport(0, 0, m_width, m_height);
 
 		glClearColor(0.00f, 0.20f, 0.25f, 1.0f);
+
+		// actual buffers etc.
+		unsigned int VAO;
+		glGenVertexArrays(1, &VAO);
+		glBindVertexArray(VAO);
+
+		float vertices[]{
+				-0.5f, -0.5f, 0.0f,
+				+0.5f, -0.5f, 0.0f,
+				+0.0f, +0.5f, 0.0f
+		};
+
+		unsigned int VBO;
+		glGenBuffers(1, &VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+
+		shaderProgram.init("assets/shader.glsl");
+		shaderProgram.use();
 	}
 
-	void init() {
-		{
-			int major, minor, revision;
-			glfwGetVersion(&major, &minor, &revision);
-			log << "Window init.\nGLFW version: "
-				<< major << "." << minor << "." << revision << "\n";
-		}
-
-		setupWindow();
-		setupOpenGL();
-	}
-
-	void loop() {
-		while(!glfwWindowShouldClose(window)) {
+	void Window::loop() {
+		while(!glfwWindowShouldClose(m_window)) {
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			glfwSwapBuffers(window);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+
+			glfwSwapBuffers(m_window);
 			glfwPollEvents();
 		}
 	}
 
-	void setWindowShouldClose() {
-		glfwSetWindowShouldClose(window, 1);
+	void Window::setWindowShouldClose() {
+		glfwSetWindowShouldClose(m_window, 1);
 	}
 
-	void terminate() {
-		log << "Terminating.\n";
-		glfwDestroyWindow(window);
+	Window::~Window() {
+		log << "Closing window.\n";
+		glfwDestroyWindow(m_window);
 		glfwTerminate();
 	}
 
-	// Events:
-	void onWindowSizeChanged(GLFWwindow *window, int width, int height) {
+	void Window::onWindowSizeChanged(GLFWwindow *window, int width, int height) {
 		glViewport(0, 0, width, height);
 	}
 
-	void onWindowClose(GLFWwindow *window) {
+	void Window::onWindowClose(GLFWwindow *window) {
 		glfwSetWindowShouldClose(window, 1);
 	}
 }
