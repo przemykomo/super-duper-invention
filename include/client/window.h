@@ -5,26 +5,26 @@
 #include "client/gl/ShaderProgram.h"
 
 namespace cmakub {
-	class Window {
-	private:
-		int m_width;
-		int m_height;
+    class Window {
+    private:
+        int m_width;
+        int m_height;
 
-		GLFWwindow* m_window;
+        GLFWwindow* m_window;
 
-		gl::ShaderProgram shaderProgram;
+        gl::ShaderProgram shaderProgram;
 
-		inline void setupWindow();
-		inline void setupGL();
+        inline void setupWindow();
+        inline void setupGL();
 
-		static void onWindowSizeChanged(GLFWwindow *window, int width, int height);
-		static void onWindowClose(GLFWwindow *window);
-	public:
-		Window(int width, int height);
-		void loop();
-		void setWindowShouldClose();
-		~Window();
-	};
+        static void onWindowSizeChanged(GLFWwindow *window, int width, int height);
+        static void onWindowClose(GLFWwindow *window);
+    public:
+        Window(int width, int height);
+        void loop();
+        void setWindowShouldClose();
+        ~Window();
+    };
 }
 
 #endif /* WINDOW_H_ */

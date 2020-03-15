@@ -7,21 +7,21 @@
 
 //int main(int argc, char **argv) {
 int main() {
-	spdlog::info("Launching game...");
+    spdlog::info("Launching game...");
 
-	cmakub::math::Vec3 vector{2.0f, 3.0f, 4.0f};
-	spdlog::info("Vector: {}", vector.cross(cmakub::math::Vec3(5.0f, 6.0f, 7.0f)));
+    cmakub::math::Vec3 vector{2.0f, 3.0f, 4.0f};
+    spdlog::info("Vector: {}", vector.cross(cmakub::math::Vec3(5.0f, 6.0f, 7.0f)));
 
-	//change to std::jthread in C++20
-	std::thread gameLogic(cmakub::logic::run);
+    //change to std::jthread in C++20
+    std::thread gameLogic(cmakub::logic::run);
 
-	spdlog::info("Graphics thread.");
+    spdlog::info("Graphics thread.");
 
-	cmakub::Window window(640, 480);
-	window.loop();
+    cmakub::Window window(640, 480);
+    window.loop();
 
-	cmakub::logic::setShouldNotRun();
+    cmakub::logic::setShouldNotRun();
 
-	gameLogic.join();
-	return 0;
+    gameLogic.join();
+    return 0;
 }
