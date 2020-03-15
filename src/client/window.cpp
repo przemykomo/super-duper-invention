@@ -1,15 +1,14 @@
+#include <spdlog/spdlog.h>
 #include "client/window.h"
-#include "common/log.h"
 
 namespace cmakub {
 	Window::Window(int width, int height) :
-	m_width{width}, m_height{height}, m_window{} {
+				m_width{width}, m_height{height}, m_window{} {
 #ifndef NDEBUG
 		{
 			int major, minor, revision;
 			glfwGetVersion(&major, &minor, &revision);
-			log << "Window init.\nGLFW version: "
-				<< major << "." << minor << "." << revision << "\n";
+			spdlog::debug("GLFW version: {}.{}.{}", major, minor, revision);
 		}
 #endif
 		setupWindow();
@@ -18,7 +17,7 @@ namespace cmakub {
 
 	void Window::setupWindow() {
 		if(!glfwInit()) {
-				log << "Can't initialize GLFW!\n";
+				spdlog::error("Can't initialize GLFW!");
 		}
 
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -27,7 +26,7 @@ namespace cmakub {
 		m_window = glfwCreateWindow(m_width, m_height, "cmakub", NULL, NULL);
 
 		if(!m_window) {
-			log << "Window or OpenGL context creation has falied!\n";
+			spdlog::error("Window or OpenGL context creation has falied!");
 		}
 
 		glfwMakeContextCurrent(m_window);
@@ -39,14 +38,13 @@ namespace cmakub {
 
 	void Window::setupGL() {
 		if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-			log << "Can't load OpenGL functions!\n";
+			spdlog::error("Can't load OpenGL functions!");
 		}
 
 		glViewport(0, 0, m_width, m_height);
 
 		glClearColor(0.00f, 0.20f, 0.25f, 1.0f);
 
-		// actual buffers etc.
 		unsigned int VAO;
 		glGenVertexArrays(1, &VAO);
 		glBindVertexArray(VAO);
@@ -85,7 +83,7 @@ namespace cmakub {
 	}
 
 	Window::~Window() {
-		log << "Closing window.\n";
+		spdlog::info("Closing window.\n");
 		glfwDestroyWindow(m_window);
 		glfwTerminate();
 	}

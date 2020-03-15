@@ -2,10 +2,11 @@
 #include <sstream>
 #include <string>
 
+#include <spdlog/spdlog.h>
+
 #include "client/gl/ShaderProgram.h"
 #include "client/gl/opengl.h"
 
-#include "common/log.h"
 
 namespace cmakub::gl {
 	enum ShaderType {
@@ -19,7 +20,7 @@ namespace cmakub::gl {
 
 		std::ifstream file(srcPath);
 		if (!file) {
-			log << "Shader source file " << srcPath << " cannot be opened!\n";
+			spdlog::error("Shader source file {} cannot be opened!", srcPath);
 			return;
 		}
 
@@ -57,7 +58,9 @@ namespace cmakub::gl {
 		{
 			char infoLog[512];
 			glGetProgramInfoLog(ID, 512, NULL, infoLog);
-			log << "Shader Program log:\n" << infoLog << '\n';
+			if(infoLog[0] != '\0') {
+				spdlog::warn(infoLog);
+			}
 		}
 #endif
 		glDeleteShader(vertexShader);
@@ -79,7 +82,9 @@ namespace cmakub::gl {
 		{
 			char infoLog[512];
 			glGetShaderInfoLog(shaderID, 512, NULL, infoLog);
-			log << "Shader log:\n" << infoLog << '\n';
+			if(infoLog[0] != '\0') {
+				spdlog::warn(infoLog);
+			}
 		}
 #endif
 
