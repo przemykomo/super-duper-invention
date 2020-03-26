@@ -1,23 +1,39 @@
-#include <mutex>
+#include <thread>
+#include <memory>
 #include <spdlog/spdlog.h>
 #include "client/logic/run.h"
+#include "client/threadsData.h"
 
 namespace cmakub::logic {
-    bool shouldRun{true};
-    World world{};
-    std::mutex shouldRun_mutex;
+    void run(std::shared_ptr<ThreadsData> data_ptr) {
+        data_ptr->logicThreadRunning = true;
 
-    void run() {
         spdlog::info("Logic thread.");
-        {
-            std::lock_guard<std::mutex> chunkLock(world.chunk_mutex);
-            world.blocks[0][1][0] = 1;
-        }
-        while(shouldRun) {}
-    }
 
-    void setShouldNotRun() {
-        std::lock_guard<std::mutex> lock(shouldRun_mutex);
-        shouldRun = false;
+        while(data_ptr->logicThreadRunning.load()) {
+            if(data_ptr->cameraMovement.load()) {
+                std::lock_guard<std::mutex> guard(data_ptr->cameraMutex);
+                const float cameraSpeed{0.05f};
+
+                if(data_ptr->cameraMovement.load() & cmakub::ThreadsData::front) {
+                    data_ptr->camera.pos += data_ptr->camera.front * cameraSpeed;
+                }
+                if(data_ptr->cameraMovement.load() & cmakub::ThreadsData::back) {
+                    data_ptr->camera.pos -= data_ptr->camera.front * cameraSpeed;
+                }
+                if(data_ptr->cameraMovement.load() & cmakub::ThreadsData::left) {
+                    data_ptr->camera.pos -= (data_ptr->camera.front.cross(data_ptr->camera.up)).normalize() * cameraSpeed;
+                }
+                if(data_ptr->cameraMovement.load() & cmakub::ThreadsData::right) {
+                    data_ptr->camera.pos += (data_ptr->camera.front.cross(data_ptr->camera.up)).normalize() * cameraSpeed;
+                }
+
+                data_ptr->updateCamera = true;
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        }
+
+        spdlog::info("Closing logic thread.");
     }
 }

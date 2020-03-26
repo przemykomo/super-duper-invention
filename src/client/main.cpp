@@ -1,26 +1,26 @@
 #include <thread>
+#include <memory>
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 #include "client/window.h"
 #include "client/logic/run.h"
-#include "common/math/vec3.h"
+#include "client/threadsData.h"
 
 //int main(int argc, char **argv) {
 int main() {
     spdlog::info("Launching game...");
 
-    cmakub::math::Vec3 vector{2.0f, 3.0f, 4.0f};
-    spdlog::info("Vector: {}", vector.cross(cmakub::math::Vec3(5.0f, 6.0f, 7.0f)));
+    std::shared_ptr<cmakub::ThreadsData> threadsData = std::make_shared<cmakub::ThreadsData>();
 
     //change to std::jthread in C++20
-    std::thread gameLogic(cmakub::logic::run);
+    std::thread gameLogic(cmakub::logic::run, threadsData);
 
     spdlog::info("Graphics thread.");
 
-    cmakub::Window window(640, 480);
+    cmakub::Window window(640, 480, threadsData);
     window.loop();
 
-    cmakub::logic::setShouldNotRun();
+    threadsData->logicThreadRunning = false;
 
     gameLogic.join();
     return 0;

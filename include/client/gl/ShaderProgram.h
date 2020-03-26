@@ -12,6 +12,7 @@ namespace cmakub::gl {
     public:
         void init(const std::string &srcPath);
         void use();
+        unsigned int getID();
     };
 } /* namespace cmakub::gl */
 

@@ -1,14 +1,9 @@
 #ifndef INCLUDE_CLIENT_LOGIC_RUN_H_
 #define INCLUDE_CLIENT_LOGIC_RUN_H_
-#include <mutex>
-#include "common/world.h"
+#include "client/threadsData.h"
 
 namespace cmakub::logic {
-    extern bool shouldRun;
-    extern World world;
-    extern std::mutex shouldRun_mutex;
-    void setShouldNotRun();
-    void run();
+    void run(std::shared_ptr<ThreadsData> data_ptr);
 }
 
 #endif /* INCLUDE_CLIENT_LOGIC_RUN_H_ */

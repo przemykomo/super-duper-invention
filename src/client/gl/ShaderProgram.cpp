@@ -6,7 +6,7 @@
 
 #include "client/gl/ShaderProgram.h"
 #include "client/gl/opengl.h"
-
+#include "common/math/mat4.h"
 
 namespace cmakub::gl {
     enum ShaderType {
@@ -65,6 +65,18 @@ namespace cmakub::gl {
 #endif
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
+
+        glUseProgram(ID);
+
+        //temporary
+        math::Mat4 view{};
+        view.translate(math::Vec3(0.0f, 0.0f, -3.0f));
+        int viewLoc{ glGetUniformLocation(ID, "view") };
+        glUniformMatrix4fv(viewLoc, 1, GL_TRUE, view.ptr());
+
+        math::Mat4 projection = math::perspective(0.1f, 100.0f, 640.0f / 480.0f, 45 * 3.14159265358f / 180);
+        int projLoc{ glGetUniformLocation(ID, "projection") };
+        glUniformMatrix4fv(projLoc, 1, GL_TRUE, projection.ptr());
     }
 
     unsigned int ShaderProgram::initShader(const std::stringstream &shaderSrcStream, GLenum type) {
@@ -94,5 +106,9 @@ namespace cmakub::gl {
 
     void ShaderProgram::use() {
         glUseProgram(ID);
+    }
+
+    unsigned int ShaderProgram::getID() {
+        return ID;
     }
 } /* namespace cmakub::gl */
